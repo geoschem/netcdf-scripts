@@ -116,9 +116,7 @@ sub isMonotonic($) {
 
   # Arrays
   $list =~ s/[A-Z][a-z][=]//g;
-  print "LIST $list\n";
   my @result  = split( /,/, $list );
-  print "RESULT @result\n";
 
   # If there is only one value, then return with success
   if ( scalar( @result ) == 1 ) { return( "is a single value" ); }
@@ -128,8 +126,6 @@ sub isMonotonic($) {
   if    ( $diff >  0 ) { $direction =  1; }
   elsif ( $diff == 0 ) { $direction =  0; }
   else                 { $direction = -1; }
-  
-  print "$direction\n";
 
   # If the direction is zero then this means we have repeat values
   if ( $direction == 0 ) { return( "has repeat values" ); }
