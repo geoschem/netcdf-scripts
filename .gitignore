@@ -1,0 +1,8 @@
+# https://www.atlassian.com/git/tutorials/saving-changes/gitignore
+# https://linuxize.com/post/gitignore-ignoring-files-in-git
+
+# temporary files:
+*.~*
+*~
+.\#*
+\#*
