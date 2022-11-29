@@ -1,4 +1,4 @@
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/geoschem/netcdf-scripts/blob/main/LICENSE.txt)
+[![Latest Release](https://img.shields.io/github/v/release/geoschem/netcdf-scripts?label=Latest%20Release)](http://github.com/geoschem/netcdf-scripts/releases) [![Release date](https://img.shields.io/github/release-date/geoschem/netcdf-scripts)](https://github.com/geoschem/netcdf-scripts) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7377643.svg)](https://doi.org/10.5281/zenodo.7377643) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/geoschem/netcdf-scripts/blob/main/LICENSE.txt)
 
 # netcdf-scripts
 
