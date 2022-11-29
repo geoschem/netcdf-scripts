@@ -1,0 +1,18 @@
+{
+    "access_right": "open",
+    "creators": [
+	{
+	    "name": "The International GEOS-Chem User Community"
+	}
+    ],
+    "description": "netcdf-scripts: Scripts for editing netCDF files",
+    "keywords": [
+	"netcdf",
+	"netcdf-fortran",
+	"geos-chem",
+	"nco",
+	"cdo"
+    ],
+    "license": "mit-license",
+    "upload_type": "software"
+}

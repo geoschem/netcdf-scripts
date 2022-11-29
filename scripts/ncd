@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------
+#                  GEOS-Chem Global Chemical Transport Model                  !
+#------------------------------------------------------------------------------
+#  ncd
+#
+#  Wrapper for the netCDF "ncdump" command.  This is a useful
+#  shortcut for displaying header information from netCDF files.
+#
+#  Calling sequence:
+#  -----------------
+#  ncd FILENAME
+#
+#  Examples:
+#  ---------
+#  ncd GEOSChem.SpeciesConc.20170101_0000z.nc4
+#  ncd HEMCO_diagnostics.201701010000.nc
+#
+#  Dependencies:
+#  -------------
+#  ncdump (from your netCDF installation)
+#   -c : Print the COARDS/CF index vectors
+#   -t : Display time dimension in YYYY-MM-DD format
+#   -s : Display chunking and deflation status
+#------------------------------------------------------------------------------
+
+# Make sure a file is passed
+if [[ ! -f $1  ]]; then
+    echo "Usage: ncd FILENAME"
+    exit 1
+fi
+
+# Use the which command to make sure we get the version of ncdump that has 
+# been loaded into the environment (and not a default system version).
+$(which ncdump) -cts $1 | less

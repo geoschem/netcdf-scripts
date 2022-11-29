@@ -1,0 +1,63 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------
+#                  GEOS-Chem Global Chemical Transport Model                  !
+#------------------------------------------------------------------------------
+#  time_units
+#
+#  Resets the "time:units" string for COARDS compliance.
+#
+#  Calling sequence:
+#  -----------------
+#  time_units units refdate reftime filename   # Specify everything
+#  time_units units refdate filename           # Assume reftime=00:00:00
+#  time_units refdate filename                 # Assume reftime=00:00:00
+#                                                 #  and units="minutes"
+#
+#  Examples:
+#  ---------
+#  time_units seconds 2022-01-01 00:00:00 myfile.nc
+#  time_units hours 2022-07-01 myfile.nc
+#  time_units 2022-07-01 myfile.nc
+#
+#  Dependencies:
+#  -------------
+#  (1) ncatted (from the netCDF operators, aka NCO)
+#
+#  Notes:
+#  ------
+#  "time:units" must be one of these formats:
+#     (1) days since YYYY-MM-DD hh:mm:ss
+#     (2) hours since YYYY-MM-DD hh:mm:ss
+#     (3) minutes since YYYY-MM-DD hh:mm:ss
+#     (4) seconds since YYYY-MM-DD hh:mm:ss 
+#  Note that "months since" and "years since" are not valid unit strings
+#  since they both can have a different number of days.
+#-----------------------------------------------------------------------------
+
+if [[ $# -eq 4 ]]; then
+    the_units="$1"
+    the_date="$2"
+    the_time="$3"
+    the_file="$4"
+elif [[ $# -eq 3 ]]; then
+    the_units="$1"
+    the_date="$2"
+    the_time="00:00:00"
+    the_file="$3"
+elif [[ $# -eq 2 ]]; then
+    the_units="minutes"
+    the_date="$1"
+    the_time="00:00:00"
+    the_file="$2"
+else
+    echo "Usage: time_units: [units] YYYY-MM-DD [hh:mm:ss] filename"
+    exit 1
+fi
+
+# New unit string
+unit_str="${the_units} since ${the_date} ${the_time}"
+echo "time:units = '${unit_str}'"
+
+# Update the unit string
+$(which ncatted) -a units,time,o,c,"${unit_str}" ${the_file}

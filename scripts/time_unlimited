@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------
+#                  GEOS-Chem Global Chemical Transport Model                  !
+#------------------------------------------------------------------------------
+#  time_unlimited
+#
+#  Changes a fixed time dimension into an UNLIMITED dimension.
+#
+#  Calling sequence:
+#  -----------------
+#  time_unlimited FILENAME
+#
+#  Examples:
+#  ---------
+#  time_unlimited GEPA_Monthly.nc
+#
+#  Dependencies:
+#  -------------
+#  (1) ncks (from the netCDF operators, aka NCO)
+#-----------------------------------------------------------------------------
+
+# Make sure a file is passed
+if [[ ! -f ${1} ]]; then
+    echo "Usage: make_time_unlimited.sh FILENAME"
+    exit 1
+fi
+
+# Make time the record dimension
+$(which ncks) -O --mk_rec_dmn time ${1} temp_${1}
+
+# Rename the file if successful
+[[ -f temp_${1} ]] && mv temp_${1} ${1}
+
+# Remove temporary files leftover by ncks
+rm -f temp_${1}*.nc*
