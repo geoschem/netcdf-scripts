@@ -1074,8 +1074,8 @@ printResults:
   #=========================================================================
   print "\n" . "-"x75;
   print "\nFor detailed instructions on how to edit netCDF files, see:\n";
-  print " 1. Work with netCDF files and\n";
-  print " 2. Prepare COARDS-compliant netCDF files\n";
+  print qq/ 1. "Work with netCDF files" and\n/;
+  print qq/ 2. "Prepare COARDS-compliant netCDF files"\n/;
   print "at the GEOS-Chem manual (geos-chem.readthedocs.io).\n";
 
   # Return w/ error code
