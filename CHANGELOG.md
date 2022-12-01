@@ -4,6 +4,11 @@ This file documents all notable changes to the netcdf-scripts repository.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2022-12-01
+### Changed
+- Exit `isCoards` if the netCDF input file is not found
+- Now point user to more information about editing netCDF files at geos-chem.readthedocs.io
+
 ## [0.1.2] - 2022-11-30
 ### Changed
 - Updated CHANGELOG.md with latest version information

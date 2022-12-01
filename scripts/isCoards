@@ -1069,8 +1069,14 @@ printResults:
   print "-"x75 . "\n";
   foreach $line ( @OPT ) { print "$line" }
 
-  print "\nFor more information how to fix non COARDS-compliant items, see:\n";
-  print "http://wiki.geos-chem.org/Preparing_data_files_for_use_with_HEMCO\n";
+  #=========================================================================
+  # Footer
+  #=========================================================================
+  print "\n" . "-"x75;
+  print "\nFor detailed instructions on how to edit netCDF files, see:\n";
+  print " 1. Work with netCDF files and\n";
+  print " 2. Prepare COARDS-compliant netCDF files\n";
+  print "at the GEOS-Chem manual (geos-chem.readthedocs.io).\n";
 
   # Return w/ error code
   return( $? );
@@ -1128,7 +1134,17 @@ sub parseFile($) {
   # Arrays
   my @result  = ();
   my @result2 = ();
-  my @text    = qx( ncdump -c $fileName );
+  my @text    = ();
+
+  #=========================================================================
+  # Exit if the file is not found
+  #=========================================================================
+    if ( -f $fileName ) {
+    @text = qx(ncdump -c $fileName);
+  } else {
+    print "isCoards: Could not find $fileName\n";
+    exit(1);
+  }
 
   #=========================================================================
   # Loop over the output of ncdump, line by line
