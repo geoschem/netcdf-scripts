@@ -4,6 +4,13 @@ This file documents all notable changes to the netcdf-scripts repository.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] -- 2022-12-15
+### Added
+- Added extra checks to `isCoards` for issues that would prevent a netCDF file from being read into GCHP
+
+### Changed
+- Changed the temporary filename in `nc_chunk.pl` from `tmp.nc` to `tmp.$ncFile`.  This allows files named "tmp.nc" to be chunked & compressed.
+
 ## [0.1.3] - 2022-12-01
 ### Changed
 - Exit `isCoards` if the netCDF input file is not found
