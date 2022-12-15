@@ -64,6 +64,7 @@
 #  &isMonotonic($)     : Checks index variables for monotonicity
 #  &isFirstValueZero($): Checks if the first time point is zero (GCHP req)
 #  &analyzeTime($)     : Checks the "time" variable for COARDS compliance
+#  &analyzeILev($)      : Checks the "lev" variable for COARDS compliance
 #  &analyzeLev($)      : Checks the "lev" variable for COARDS compliance
 #  &analyzeLat($)      : Checks the "lat" variable for COARDS compliance
 #  &analyzeLon($)      : Checks the "lon" variable for COARDS compliance
@@ -116,6 +117,7 @@ sub isMonotonic($) {
 
   # Arrays
   $list =~ s/[A-Z][a-z][=]//g;
+  $list =~ s/;//g;
   my @result  = split( /,/, $list );
 
   # If there is only one value, then return with success
@@ -180,8 +182,8 @@ sub isFirstValueZero($) {
   my @result  = split( /,/, $list );
 
   # Test the first value
-  if ( $result[0] == "0" ) { return "[0] = 0 (this is required for GCHP)" }
-  else                     { return "[0] != 0 (this is required for GCHP)" }
+  if ( $result[0] == "0" ) { return "[0] = 0 (requirement for GCHP)" }
+  else                     { return "[0] != 0 (problem for GCHP)"    }
 }
 #EOC
 #------------------------------------------------------------------------------
@@ -216,6 +218,15 @@ sub analyzeTime($) {
   # Strings
   my $msg    = "";
   my $value  = "";
+
+  # %%%%% Make sure the dimension name has only lowercase letters
+  if ( $varDims{$var} =~ m/[a-z]/ ) {
+    $msg  = qq/$sep Dimension "$var" uses only lowercase letters (requirement for GCHP)\n/;
+    @GOOD = ( @GOOD, $msg );
+  } else {
+    $msg  = qq/$sep Dimension "$var" contains uppercase letters (problem for GCHP)\n/;
+    @BAD  = ( @BAD,  $msg );
+  }
 
   # %%%%% Ensure variable is declared w/ the dimension of the same name
   if ( $varDims{$var} =~ "$var" ) {
@@ -306,6 +317,15 @@ sub analyzeTime($) {
     @BAD  = ( @BAD,  $msg );
   }
 
+  # %%%%% Also make sure that time:units does not contain decimals
+  if ( $value =~ m/./ ) {
+    $msg  = qq/$sep "time:units" contains decimals (problem for GCHP)\n/;
+    @BAD  = ( @BAD,  $msg );
+  } else {
+    $msg  = qq/$sep "time:units" does not contain decimals (requirement for GCHP)\n/;
+    @GOOD = ( @GOOD, $msg );
+  }
+
   # Return w/ error code
   return( $? );
 }
@@ -315,7 +335,7 @@ sub analyzeTime($) {
 #------------------------------------------------------------------------------
 #BOP
 #
-# !IROUTINE: analyzeLev
+# !IROUTINE: analyzeILev
 #
 # !DESCRIPTION: Checks the attributes of the lev variable to see if
 #  they adhere to the COARDS standard.
@@ -339,6 +359,15 @@ sub analyzeILev($) {
   my $msg   = "";
   my $value = "";
 
+  # %%%%% Make sure the dimension name has only lowercase letters
+  if ( $varDims{$var} =~ m/[a-z]/ ) {
+    $msg  = qq/$sep Dimension "$var" uses only lowercase letters (requirement for GCHP)\n/;
+    @GOOD = ( @GOOD, $msg );
+  } else {
+    $msg  = qq/$sep Dimension "$var" contains uppercase letters (problem for GCHP)\n/;
+    @BAD  = ( @BAD,  $msg );
+  }
+
   # %%%%% Ensure variable is declared with the dimension of the same name
   if ( $varDims{$var} = "$var" ) {
     $msg  = qq/$sep $var($varDims{$var})\n/;
@@ -355,6 +384,15 @@ sub analyzeILev($) {
     @BAD  = ( @BAD,  $msg );
   } else {
     $msg  = qq/$sep $var $value\n/;
+    @GOOD = ( @GOOD,  $msg );
+  }
+
+  # %%%%% Check if there are 73 level edges
+  if ( length( $levels ) < 73 ) {
+    $msg  = qq/$sep $var has less than 73 level edges (problem for GCHP)!\n/;
+    @BAD  = ( @BAD,  $msg );
+  } else {
+    $msg  = qq/$sep $var has 73 level edges (requirement for GCHP)\n/;
     @GOOD = ( @GOOD,  $msg );
   }
 
@@ -378,8 +416,8 @@ sub analyzeILev($) {
     $msg  = qq/$sep $var:positive =$value\n/;
     @GOOD = ( @GOOD, $msg );
   } else {
-    $msg  = qq/$sep Consider adding $var:positive = "up" (or "down", as the case may be)\n/;
-    @OPT  = ( @OPT,  $msg );
+    $msg  = qq/$sep $var:positive attribute is missing (problem for GCHP)\n/;
+    @BAD  = ( @BAD,  $msg );
   }
 
   # %%%%% Check the long_name attribute
@@ -454,6 +492,15 @@ sub analyzeLev($) {
   my $msg   = "";
   my $value = "";
 
+  # %%%%% Make sure the dimension name has only lowercase letters
+  if ( $varDims{$var} =~ m/[a-z]/ ) {
+    $msg  = qq/$sep Dimension "$var" uses only lowercase letters (requirement for GCHP)\n/;
+    @GOOD = ( @GOOD, $msg );
+  } else {
+    $msg  = qq/$sep Dimension "$var" contains uppercase letters (problem for GCHP)\n/;
+    @BAD  = ( @BAD,  $msg );
+  }
+
   # %%%%% Ensure variable is declared with the dimension of the same name
   if ( $varDims{$var} = "$var" ) {
     $msg  = qq/$sep $var($varDims{$var})\n/;
@@ -470,6 +517,15 @@ sub analyzeLev($) {
     @BAD  = ( @BAD,  $msg );
   } else {
     $msg  = qq/$sep $var $value\n/;
+    @GOOD = ( @GOOD,  $msg );
+  }
+
+  # %%%%% Check that there are 72 level centers
+  if ( length( $levels ) < 72 ) {
+    $msg  = qq/$sep $var has less than 72 level centers (problem for GCHP)!\n/;
+    @BAD  = ( @BAD,  $msg );
+  } else {
+    $msg  = qq/$sep $var has 72 level centers (requirement for GCHP)\n/;
     @GOOD = ( @GOOD,  $msg );
   }
 
@@ -493,8 +549,8 @@ sub analyzeLev($) {
     $msg  = qq/$sep $var:positive =$value\n/;
     @GOOD = ( @GOOD, $msg );
   } else {
-    $msg  = qq/$sep Consider adding $var:positive = "up" (or "down", as the case may be)\n/;
-    @OPT  = ( @OPT,  $msg );
+    $msg  = qq/$sep $var:positive attribute is missing (problem for GCHP)\n/;
+    @BAD  = ( @BAD,  $msg );
   }
 
   # %%%%% Check the long_name attribute
@@ -568,6 +624,15 @@ sub analyzeLat($) {
 #
   my $msg   = "";
   my $value = "";
+
+  # %%%%% Make sure the dimension name has only lowercase letters
+  if ( $varDims{$var} =~ m/[a-z]/ ) {
+    $msg  = qq/$sep Dimension "$var" uses only lowercase letters (requirement for GCHP)\n/;
+    @GOOD = ( @GOOD, $msg );
+  } else {
+    $msg  = qq/$sep Dimension "$var" contains uppercase letters (problem for GCHP)\n/;
+    @BAD  = ( @BAD,  $msg );
+  }
 
   # %%%%% Ensure variable is declared with the dimension of the same name
   if ( $varDims{$var} = "$var" ) {
@@ -663,6 +728,15 @@ sub analyzeLon($) {
   my $msg   = "";
   my $value = "";
 
+  # %%%%% Make sure the dimension name has only lowercase letters
+  if ( $varDims{$var} =~ m/[a-z]/ ) {
+    $msg  = qq/$sep Dimension "$var" uses only lowercase letters (requirement for GCHP)\n/;
+    @GOOD = ( @GOOD, $msg );
+  } else {
+    $msg  = qq/$sep Dimension "$var" contains uppercase letters (problem for GCHP)\n/;
+    @BAD  = ( @BAD,  $msg );
+  }
+
   # %%%%% Ensure variable is declared with the dimension of the same name
   if ( $varDims{$var} = "$var" ) {
     $msg  = qq/$sep $var($varDims{$var})\n/;
@@ -757,6 +831,10 @@ sub analyzeVar($) {
   # Scalars
   my $i         = 0;
   my $foundDims = 0;
+  my $pTime     = -1;
+  my $pLev      = -1;
+  my $pLat      = -1;
+  my $pLon      = -1;
 
   # Strings
   my $msg       = "";
@@ -784,6 +862,42 @@ sub analyzeVar($) {
   } else {
     $msg  = qq/$sep $var needs to be declared with ($varDims{$var})\n/;
     @BAD  = ( @BAD,  $msg );
+  }
+
+  # %%%%% Check the dimension ordering in variables
+  # %%%%% This should be time, then lev, then lat, then lon
+  if ( $dimsInVar =~ m/time/ ) { $pTime = index( $dimsInVar, "time" ); }
+  if ( $dimsInVar =~ m/lev/  ) { $pLev  = index( $dimsInVar, "lev"  ); }
+  if ( $dimsInVar =~ m/lat/  ) { $pLat  = index( $dimsInVar, "lat"  ); }
+  if ( $dimsInVar =~ m/lon/  ) { $pLon  = index( $dimsInVar, "lon"  ); }
+
+  if ( $dimsInVar =~ m/lev/  ) {
+
+    # Variable has the "lev" dimension
+    if ( ( $pLon > $pLat  ) && ( $pLon > $pLev  ) && ( $pLon > $pTime )  &&
+         ( $pLat > $pLev  ) && ( $pLat > $pTime ) &&
+         ( $pLev > $pTime ) &&
+	 ( $pTime == 0    ) ) {
+      $msg  = qq/$sep $var has proper dimension ordering (requirement for GCHP)\n/;
+      @GOOD = ( @GOOD, $msg );
+    } else {
+      $msg  = qq/$sep $var has improper dimension ordering (problem for GCHP)\n/;
+      @BAD = ( @BAD, $msg );
+    }
+
+  } else {
+
+    # Variable does not have the "lev" dimension
+    if ( ( $pLon > $pLat  ) && ( $pLon > $pTime )  &&
+         ( $pLat > $pTime ) &&
+	 ( $pTime == 0    ) ) {
+      $msg  = qq/$sep $var has proper dimension ordering (requirement for GCHP)\n/;
+      @GOOD = ( @GOOD, $msg );
+    } else {
+      $msg  = qq/$sep $var has improper dimension ordering (problem for GCHP)\n/;
+      @BAD = ( @BAD, $msg );
+    }
+
   }
 
   # %%%%% Check the long_name attribute
@@ -837,26 +951,6 @@ sub analyzeVar($) {
     $msg  = qq/$sep Consider adding $var:missing_value\n/;
     @OPT  = ( @OPT,  $msg );
   }
-
-#  # %%%%% Check the add_offset attribute (optional)
-#  $value = $add_offset{$var};
-#  if ( defined( $value ) && $value ne "" ) {
-#    $msg = qq/$sep $var:add_offset =$value\n/;
-#    @GOOD = ( @GOOD, $msg );
-#  } else {
-#    $msg  = qq/$sep Consider adding $var:add_offset\n/;
-#    @OPT  = ( @OPT,  $msg );
-#  }
-#
-#  # %%%%% Check the scale_factor attribute (optional)
-#  $value = $scale_factor{$var};
-#  if ( defined( $value ) && $value ne "" ) {
-#    $msg = qq/$sep $var:scale_factor =$value\n/;
-#    @GOOD = ( @GOOD, $msg );
-#  } else {
-#    $msg  = qq/$sep Consider adding $var:scale_factor\n/;
-#    @OPT  = ( @OPT,  $msg );
-#  }
 
   # Return with error code
   return( $? );
@@ -979,8 +1073,7 @@ sub analyzeResults() {
   #=========================================================================
 
 
-  # Check dimensions: Only lon, lat, lev, ilev, and time are acceptable;
-  # Otherwise GCHP simulations will die when reading the file (bmy, 6/14/18)
+  # Check dimensions
   foreach $dim ( @dims ) {
     if ( ( $dim =~ m/[Tt][Ii][Mm][Ee]/  ) ||
          ( $dim =~ m/[Ii][Ll][Ee][Vv]/  ) ||
@@ -1077,6 +1170,7 @@ printResults:
   print qq/ 1. "Work with netCDF files" and\n/;
   print qq/ 2. "Prepare COARDS-compliant netCDF files"\n/;
   print "at the GEOS-Chem manual (geos-chem.readthedocs.io).\n";
+  print "-"x75 ."\n";
 
   # Return w/ error code
   return( $? );
@@ -1207,7 +1301,7 @@ sub parseFile($) {
 	# Flag if the variable is of type "int", which will cause
 	# GCHP simulations to die with an error
 	if ( $varType =~ m/int/ ) {
-	  $msg = qq/Variable "$varName" is of type "int" (not allowed for GCHP)\n/;
+	  $msg = qq/Variable "$varName" is of type "int" (problem for GCHP)\n/;
 	  @BAD = ( @BAD,  $msg );
         }
 
