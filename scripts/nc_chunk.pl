@@ -174,7 +174,7 @@ quit:
   if ( $deflate > 0 ) { $cmd .= " -d$deflate" }
 
   # Add file name to the command
-  $cmd .= " $ncFile tmp.nc; mv tmp.nc $ncFile";
+  $cmd .= " $ncFile tmp.$ncFile; mv tmp.$ncFile $ncFile";
   print "$cmd\n";
 
   # Execute the command
