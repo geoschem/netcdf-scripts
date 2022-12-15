@@ -318,7 +318,7 @@ sub analyzeTime($) {
   }
 
   # %%%%% Also make sure that time:units does not contain decimals
-  if ( $value =~ m/./ ) {
+  if ( $value =~ m/\./ ) {
     $msg  = qq/$sep "time:units" contains decimals (problem for GCHP)\n/;
     @BAD  = ( @BAD,  $msg );
   } else {
