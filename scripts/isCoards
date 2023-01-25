@@ -1172,8 +1172,10 @@ printResults:
   print "at the GEOS-Chem manual (geos-chem.readthedocs.io).\n";
   print "-"x75 ."\n";
 
-  # Return w/ error code
-  return( $? );
+  #=========================================================================
+  # Return the number of errors found as the status (success==0)
+  #=========================================================================
+  return( scalar( @BAD ) );
 }
 #EOC
 #------------------------------------------------------------------------------
@@ -1542,33 +1544,24 @@ sub main() {
 #EOP
 #------------------------------------------------------------------------------
 #BOC
-  if ( scalar( @ARGV ) == 1 ) {
 
-    # Save filename as a global variable for later use
-    $inputFile = $ARGV[0];
-
-    # Scan the output of "ncdump" into Perl variables
-    &parseFile( $inputFile );
-
-    # Determine if the file is COARDS-compliant
-    &analyzeResults();
-
-  } else {
-
-    # Otherwise exit with error
+  # Exit if wrong # of arguments are passed
+  if ( scalar( @ARGV ) != 1 ) {
     print "Usage: isCoards FILENAME\n";
     exit( -1 );
-
   }
 
-  # Return with error code
-  return( $? )
+  # Save filename as a global variable for later use
+  $inputFile = $ARGV[0];
+
+  # Scan the output of "ncdump" into Perl variables
+  &parseFile( $inputFile );
+
+  # Determine if the file is COARDS-compliant
+  return( &analyzeResults() );
 }
 
 #------------------------------------------------------------------------------
 
-# Call main routine
-main();
-
-# Return error code
-exit( $? );
+# Call main routine and exit with the status code
+exit( main() );
